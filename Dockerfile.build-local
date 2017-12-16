@@ -1,0 +1,18 @@
+FROM neo-cli-build-base
+
+WORKDIR /opt
+
+# Get code to test
+ADD neo-cli /opt/neo-cli-master
+
+WORKDIR /opt/neo-cli-master
+
+# Build the projecg
+RUN dotnet restore \
+    && dotnet publish -c Release \
+    && mv bin/Release/netcoreapp2.0/publish /opt/neo-cli
+
+WORKDIR /opt
+
+# Cleanup
+RUN rm -rf /opt/neo-cli-master
