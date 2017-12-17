@@ -7,10 +7,10 @@ ADD neo-cli /opt/neo-cli-master
 
 WORKDIR /opt/neo-cli-master
 
-# Build the project
-RUN dotnet restore
-RUN dotnet publish -c Release
-RUN mv bin/Release/netcoreapp2.0/publish /opt/neo-cli
+# Build the projecg
+RUN dotnet restore \
+    && dotnet publish -c Release \
+    && mv bin/Release/netcoreapp2.0/publish /opt/neo-cli
 
 WORKDIR /opt
 
