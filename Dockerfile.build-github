@@ -1,0 +1,18 @@
+FROM neo-cli-build-base
+
+WORKDIR /opt
+
+# Get code to test
+RUN wget https://github.com/neo-project/neo-cli/archive/master.zip
+RUN unzip master.zip
+
+WORKDIR /opt/neo-cli-master
+
+# Build the project
+RUN dotnet restore
+RUN dotnet publish -c Release
+RUN mv neo-cli/bin/Release/netcoreapp2.0/publish /opt/neo-cli
+
+WORKDIR /opt
+
+RUN zip -q -r neo-cli.zip neo-cli

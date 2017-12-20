@@ -10,19 +10,25 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Get absolute path to neo-cli project root
-NEO_CLI_PATH=$(readlink -f $1)
-echo "neo-cli project root: $NEO_CLI_PATH"
+USE_GITHUB=""
+if [[ "$1" == "github" ]]; then
+    USE_GITHUB="master"
+fi
 
 # Read path of this script into a variable. This allows to run this script from
 # anywhere, whether from inside this directory or outside.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Build the dotnet builder image (can be cached)
-docker build -f $DIR/Dockerfile.build-base -t neo-cli-build-base $NEO_CLI_PATH
+docker build -f $DIR/Dockerfile.build-base -t neo-cli-build-base $DIR
 
-# Build the current code (don't cache)
-docker build --no-cache -f $DIR/Dockerfile.build-local -t neo-cli-build $NEO_CLI_PATH
+# Build neo-cli
+if [[ -n "$USE_GITHUB" ]]; then
+    echo "USE GITHUB"
+    docker build --no-cache -f $DIR/Dockerfile.build-github -t neo-cli-build-github $DIR
+else
+    NEO_CLI_PATH=$(readlink -f $1)
+    echo "neo-cli project root: $NEO_CLI_PATH"
+    docker build --no-cache -f $DIR/Dockerfile.build-local -t neo-cli-build $NEO_CLI_PATH
+fi
 
-# Build the image for running the tests, and run them (todo)
-# docker build --no-cache -f $DIR/Dockerfile.tests -t neo-cli-tests $NEO_CLI_PATH
-# docker run -it neo-cli-tests /path-to-tests/run-tests.sh
